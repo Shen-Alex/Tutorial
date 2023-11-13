@@ -1,0 +1,60 @@
+---
+title: "Discrete variable generation by MCMC"
+author: "Alex Shen"
+date: "2023-11-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Metropolis Algorithm
+
+The Metropolis–Hastings algorithm is a Markov chain Monte Carlo (MCMC) method for obtaining a sequence of random samples from a probability distribution from which direct sampling is difficult.This sequence can be used to approximate the distribution (e.g. to generate a histogram) or to compute an integral (e.g. an expected value). Metropolis–Hastings and other MCMC algorithms are generally used for sampling from multi-dimensional distributions, especially when the number of dimensions is high. For more details see wikipedia<https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm>
+
+## An silly example
+
+The following example comes from the textbook *Doing Bayesian Data Analysis* Chapter 7
+
+Imagine a nation consisting of islands in a chain. A politician travels from island to island trying to stay in the public eye. At the end of each day, he has to decide if he should:
+* stay at the current island
+* move to the adjacent island to the west
+* move to the adjacent island to the east
+
+His goal is to visit all the islands proportionally to their relative population so he spends the most time at the most populated islands and less time at the less populated islands.
+
+Unfortunately, he does not know the total population of the island chain. However, he is able to find out the population of the island he is currently on and the population of the adjacent island.
+
+```{r cars}
+propose <- function(current){
+  current+sample(c(-1,1),size=1)
+}
+
+p <- function(x){ifelse(x %in% 1:7, x/28,0)}
+
+n <- 10^5
+set.seed(2)
+x <- c(4,rep(NA,n-1))
+for (t in 1:(n-1)){
+  current <- x[t]
+  proposed <-propose(current)
+  pmove <- p(proposed)/p(current)
+  u<-runif(1)
+  if (u<pmove){
+    x[t+1]<-proposed
+  }else{
+    x[t+1]<-current
+    }
+}
+
+counts <-table(x)
+results <- rbind(counts/n, 1:7/28)
+rownames(results)<- c("empirical","theoretical")
+results
+
+chisq.test(counts, p=(1:7)/28)
+barplot(results,beside=T,legend.text = rownames(results),args.legend=list(x = "topleft"))
+```
+
+
