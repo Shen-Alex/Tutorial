@@ -1,0 +1,14 @@
+---
+title: "Making predictions with posterior distribution"
+author: "Alex Shen"
+date: "2023-11-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## The baseball problem
+![baseball example](Monte Carlo Method/fig/Baseball.png)
